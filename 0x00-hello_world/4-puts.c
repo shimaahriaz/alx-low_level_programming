@@ -1,7 +1,6 @@
 #include <stdio.h>
 /**
  * main - A Program that prints a line with puts funct
- n
  * Return: 0 (Success)
  */
 int main(void)
