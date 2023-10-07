@@ -1,2 +1,2 @@
+0x0C. C - More malloc, free
 
-this project has mandetory tasks and 3 advansed tasks
