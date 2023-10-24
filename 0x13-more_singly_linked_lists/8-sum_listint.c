@@ -1,4 +1,5 @@
 #include "lists.h"
+
 /**
  * sum_listint - Returns the sum of all the data (n) in a listint_t linked list.
  * @head: A pointer to the head of the list.
