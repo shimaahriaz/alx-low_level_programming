@@ -1,65 +1,50 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <fcntl.h>
 #include "main.h"
-#define BUFFER_SIZE 1024
+
 /**
- * This program copies a file from one location to another.
- *Open the source file for reading.
- Read from the source file and write to the target file until the end of the
- *source file is reached.
- * It takes two command-line arguments: the source file path and the target file path. If the source file does not exist or the target file cannot be created or opened, the program prints an error message and exits. Otherwise, the program copies the contents of the source file to the target file, one buffer at a time.
- * Open the target file for writing, creating it if necessary and truncating it
- * to zero bytes.
- * Usage:
- *   cp <source_file_path> <target_file_path>
- */
-int copy_file(const char *source, const char *target);
-void handle_error(const char *msg, int code);
+* main - program that copies the content of a file to another file
+* @argc: num argument
+* @argv: string argument
+* Return: 0
+*/
+
 int main(int argc, char *argv[])
 {
+int file_from, file_to;
+int num1 = 1024, num2 = 0;
+char buf[1024];
 if (argc != 3)
+dprintf(STDERR_FILENO, "Usage: cp file_from file_to\n"), exit(97);
+file_from = open(argv[1], O_RDONLY);
+if (file_from == -1)
 {
-dprintf(STDERR_FILENO, "Usage: %s file_from file_to\n", argv[0]);
-return (97);
+dprintf(STDERR_FILENO, "Error: Can't read from file %s\n", argv[1]);
+exit(98);
 }
-int result = copy_file(argv[1], argv[2);
-return (result);
+file_to = open(argv[2], O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR
+| S_IRGRP | S_IWGRP | S_IROTH);
+if (file_to == -1)
+{
+dprintf(STDERR_FILENO, "Error: Can't write to %s\n", argv[2]);
+close(file_from), exit(99);
 }
-int copy_file(const char *source, const char *target)
+while (num1 == 1024)
 {
-int source_fd, target_fd;
-char buffer[BUFFER_SIZE];
-ssize_t bytes_read, bytes_written;
-source_fd = open(source, O_RDONLY);
-if (source_fd == -1)
+num1 = read(file_from, buf, 1024);
+if (num1 == -1)
 {
-handle_error("Can't read from file", 98);
+dprintf(STDERR_FILENO, "Error: Can't read from file %s\n", argv[1]);
+exit(98);
 }
-target_fd = open(target, O_WRONLY | O_CREAT | O_TRUNC, 0664);
-if (target_fd == -1)
-{
-handle_error("Can't write to file", 99);
+num2 = write(file_to, buf, num1);
+if (num2 < num1)
+dprintf(STDERR_FILENO, "Error: Can't write to %s\n", argv[2]), exit(99);
 }
-while ((bytes_read = read(source_fd, buffer, BUFFER_SIZE)) > 0)
-{
-bytes_written = write(target_fd, buffer, bytes_read);
-if (bytes_written == -1)
-{
-handle_error("Can't write to file", 99);
-}
-}
-if (bytes_read == -1)
-{
-handle_error("Can't read from file", 98); }
-if (close(source_fd) == -1 || close(target_fd) == -1)
-{
-handle_error("Can't close fd", 100);
-}
+if (close(file_from) == -1)
+dprintf(STDERR_FILENO, "Error: Can't close fd %d\n", file_from), exit(100);
+if (close(file_to) == -1)
+dprintf(STDERR_FILENO, "Error: Can't close fd %d\n", file_to), exit(100);
+
 return (0);
 }
-void handle_error(const char *msg, int code)
-{
-dprintf(STDERR_FILENO, "Error: %s\n", msg);
-exit(code); }
